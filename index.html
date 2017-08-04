@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+        <style>
+          .curweather {
+            background-color: rgba(255, 255, 255, 0.82);
+            padding: 15px;
+            font-size: 1.3em;
+          }
+        </style>
+    </head>
+    <body>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-4 col-md-offset-4 text-center">
+          <h1 class="bg-primary">Current Weather</h1>
+          <ul class="list-unstyled curweather">
+            <li id="city"></li>
+            <li id="weatherType"></li>
+            <li id="temperature"></li>
+            <li id="temp_min"></li>
+            <li id="temp_max"></li>
+            <li id="windSpeed"></li>
+            <li id="sunRise"></li>
+            <li id="sunSet"></li>
+          </ul>
+          <h3>This current weather forecast is brought to you by OpenWeatherMap. Through their API you can easily access current weather, forecasts, maps and historical data.</h3>
+        </div>
+        </div>
+      </div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  var lon;
+  var lat;
+  var cel;
+if (navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(function(position){
+    lon = position.coords.longitude;
+    lat = position.coords.latitude;
+
+    //access the API with geolocation
+    var api='http://api.openweathermap.org/data/2.5/weather?lat='+lat+'&lon='+lon+'&appid=b0dec03338a55815f7bb1b6333369443';
+
+    $.getJSON(api, function(data){
+      var weatherType = data.weather[0].description;
+                      var cel = ((data.main.temp)-273.15).toFixed(0);
+                      var minTemp = (data.main.temp_min)-273.15;
+                      var maxTemp = (data.main.temp_max)-273.15;
+                      var windSpeed = data.wind.speed;
+                      var sunUp = data.sys.sunrise;
+                      var sunSet = data.sys.sunset;
+                      var myDate = new Date(1000*sunUp);
+                      var hoursSunUp = "0"+myDate.getHours();
+                      var minutesSunUp = myDate.getMinutes();
+
+                      if (minutesSunUp.toString().length < 2){
+                        minutesSunUp = "0"+minutesSunUp;
+                      }
+
+                      var sunUpConverted = hoursSunUp+":"+minutesSunUp;
+
+                      var myDate2 = new Date(1000*sunSet);
+                      var hoursSunSet = myDate2.getHours();
+                      var minutesSunSet = myDate2.getMinutes();
+                      if (minutesSunSet.toString().length < 2){
+                        minutesSunSet = "0"+minutesSunSet;
+                      }
+                      var sunSetConverted = hoursSunSet+":"+minutesSunSet;
+
+                      $("#city").html("Your Location: "+data.name);
+                      $("#weatherType").html(weatherType);
+                      $("#temperature").html("Current Temperature: " + cel+" &#8451;");
+                      $("#temp_min").html("Min. Temperature: " + minTemp+" &#8451;");
+                      $("#temp_max").html("Max. Temperature: " + maxTemp+" &#8451;");
+                      $("#windSpeed").html("Wind: " + windSpeed + " mtrs. sec.");
+                      $("#sunRise").html("Sunrise: " + sunUpConverted +" Hours");
+                      $("#sunSet").html("Sunset: " + sunSetConverted +" Hours");
+    });
+  });
+}
+});
+</script>
+    </body>
+</html>
